@@ -25,7 +25,11 @@ export default function Signup() {
     }
     setLoading(true)
     try {
-      await signUp(form)
+      const data = await signUp(form)
+      if (!data.session) {
+        setError('Conta criada! Verifique seu e-mail para confirmar o cadastro antes de entrar.')
+        return
+      }
       navigate('/onboarding')
     } catch (err) {
       setError(err.message === 'User already registered'
