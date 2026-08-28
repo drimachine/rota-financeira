@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-base-bg text-ink-high font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  :focus-visible {
+    outline: 2px solid #AC85FF;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Linha de "rota" pontilhada — elemento assinatura do produto */
+  .route-line {
+    background-image: repeating-linear-gradient(90deg, #4C1D95 0, #4C1D95 6px, transparent 6px, transparent 14px);
+    height: 2px;
+  }
+  .route-line-v {
+    background-image: repeating-linear-gradient(180deg, #4C1D95 0, #4C1D95 6px, transparent 6px, transparent 14px);
+    width: 2px;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #2A2640; border-radius: 999px; }
