@@ -33,9 +33,12 @@ rota-financeira/
    - `Project URL`
    - `anon public key` (o backend usa para as chamadas de signup/login/logout)
    - `service_role key` (para o backend acessar os dados — **nunca exponha no frontend**)
-   - `JWT Secret` (em **JWT Settings**, para o backend validar os tokens)
 4. Em **Authentication > Sign In / Providers > Email**, confirme que o provedor de
    e-mail está **habilitado** (senão signup/login retornam 400 `email_provider_disabled`).
+
+O backend valida os tokens usando a chave pública do projeto, buscada em
+`{SUPABASE_URL}/auth/v1/.well-known/jwks.json` — não precisa copiar nenhum
+"JWT Secret" manualmente.
 
 ### 2. Backend (FastAPI)
 
@@ -52,7 +55,6 @@ Crie um arquivo `.env` em `backend/` com:
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_ANON_KEY=sua-anon-key
 SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
-SUPABASE_JWT_SECRET=seu-jwt-secret
 FRONTEND_ORIGINS=http://localhost:5173
 ```
 
