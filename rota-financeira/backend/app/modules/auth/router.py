@@ -3,8 +3,8 @@ from typing import Union
 from fastapi import APIRouter, HTTPException, status
 from gotrue.errors import AuthApiError
 
-from ..database import get_supabase_auth
-from ..models.schemas import (
+from ...core.database import get_supabase_auth
+from .schemas import (
     AuthSession,
     AuthUser,
     LoginRequest,

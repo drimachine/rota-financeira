@@ -19,10 +19,6 @@ export default function Signup() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (form.password.length < 6) {
-      setError('A senha precisa ter pelo menos 6 caracteres.')
-      return
-    }
     setLoading(true)
     try {
       const data = await signUp(form)

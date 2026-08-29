@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from ..database import get_supabase
-from ..dependencies import get_current_user, CurrentUser
-from ..models.schemas import CostCreate, CostOut
+from ...core.database import get_supabase
+from ...core.dependencies import get_current_user, CurrentUser
+from .schemas import CostCreate, CostOut
 
 router = APIRouter(prefix="/costs", tags=["costs"])
 

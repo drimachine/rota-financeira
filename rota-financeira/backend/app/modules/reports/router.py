@@ -3,9 +3,10 @@ from datetime import date, datetime
 
 from fastapi import APIRouter, Depends
 
-from ..database import get_supabase
-from ..dependencies import get_current_user, CurrentUser
-from ..models.schemas import DashboardSummary, GoalOut, MonthlyPoint, MonthlyReport, RecentItem
+from ...core.database import get_supabase
+from ...core.dependencies import get_current_user, CurrentUser
+from ..goals.schemas import GoalOut
+from .schemas import DashboardSummary, MonthlyPoint, MonthlyReport, RecentItem
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 

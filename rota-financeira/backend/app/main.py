@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import get_settings
-from .routers import auth, users, revenues, costs, goals, reports
+from .core.config import get_settings
+from .modules.auth.router import router as auth_router
+from .modules.users.router import router as users_router
+from .modules.revenues.router import router as revenues_router
+from .modules.costs.router import router as costs_router
+from .modules.goals.router import router as goals_router
+from .modules.reports.router import router as reports_router
 
 settings = get_settings()
 
@@ -20,12 +25,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(revenues.router)
-app.include_router(costs.router)
-app.include_router(goals.router)
-app.include_router(reports.router)
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(revenues_router)
+app.include_router(costs_router)
+app.include_router(goals_router)
+app.include_router(reports_router)
 
 
 @app.get("/", tags=["health"])
