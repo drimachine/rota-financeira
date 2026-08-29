@@ -40,7 +40,18 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env            # preencha com suas chaves do Supabase
+```
+
+Crie um arquivo `.env` em `backend/` com:
+
+```
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
+SUPABASE_JWT_SECRET=seu-jwt-secret
+FRONTEND_ORIGINS=http://localhost:5173
+```
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -52,7 +63,17 @@ A API sobe em `http://localhost:8000`. Documentação interativa em
 ```bash
 cd frontend
 npm install
-cp .env.example .env            # preencha com suas chaves do Supabase e a URL da API
+```
+
+Crie um arquivo `.env` em `frontend/` com:
+
+```
+VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-anon-key
+VITE_API_URL=http://localhost:8000
+```
+
+```bash
 npm run dev
 ```
 

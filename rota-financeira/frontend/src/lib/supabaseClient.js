@@ -7,7 +7,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   // eslint-disable-next-line no-console
   console.warn(
     '[Rota Financeira] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY não configurados. ' +
-    'Crie um arquivo .env na pasta frontend com base no .env.example.'
+    'Crie um arquivo .env na pasta frontend com essas variáveis (Project Settings > API no Supabase).'
   )
 }
 
