@@ -1,22 +1,38 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import Input, { Field, Select } from '../components/Input'
 import { api } from '../lib/api'
+import { PLATFORMS } from '../lib/platforms'
 
-const platforms = ['iFood', 'Keeta', '99', 'Outro']
+const DEFAULT_PLATFORMS = [...PLATFORMS.map((p) => p.label), 'Outro']
 
 export default function NewRevenue() {
   const navigate = useNavigate()
+  const [platforms, setPlatforms] = useState(DEFAULT_PLATFORMS)
   const [form, setForm] = useState({
     amount: '',
-    platform: platforms[0],
+    platform: DEFAULT_PLATFORMS[0],
     date: new Date().toISOString().slice(0, 10),
     notes: '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    api
+      .getProfile()
+      .then((profile) => {
+        const labels = PLATFORMS.filter((p) => profile.platforms?.includes(p.id)).map((p) => p.label)
+        if (labels.length > 0) {
+          const options = [...labels, 'Outro']
+          setPlatforms(options)
+          setForm((f) => ({ ...f, platform: options[0] }))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   function update(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }))

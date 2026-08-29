@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import Button from '../components/Button'
 import Input, { Field, Select } from '../components/Input'
+import PlatformIcon from '../components/PlatformIcon'
+import { PLATFORMS } from '../lib/platforms'
 import { api } from '../lib/api'
 
 const vehicles = [
@@ -25,19 +27,21 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false)
   const [data, setData] = useState({
     vehicle: '',
+    platforms: [],
     city: '',
     goalLabel: goalOptions[0],
     goalAmount: '',
     goalDeadline: '',
   })
 
-  const totalSteps = 3
+  const totalSteps = 4
 
   async function finish() {
     setSaving(true)
     try {
       await api.updateProfile({
         vehicle_type: data.vehicle,
+        platforms: data.platforms,
         city: data.city,
       })
       if (data.goalAmount) {
@@ -83,19 +87,28 @@ export default function Onboarding() {
         )}
 
         {step === 1 && (
-          <StepCity
-            value={data.city}
-            onChange={(city) => setData((d) => ({ ...d, city }))}
+          <StepPlatforms
+            value={data.platforms}
+            onChange={(platforms) => setData((d) => ({ ...d, platforms }))}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
           />
         )}
 
         {step === 2 && (
+          <StepCity
+            value={data.city}
+            onChange={(city) => setData((d) => ({ ...d, city }))}
+            onBack={() => setStep(1)}
+            onNext={() => setStep(3)}
+          />
+        )}
+
+        {step === 3 && (
           <StepGoal
             data={data}
             setData={setData}
-            onBack={() => setStep(1)}
+            onBack={() => setStep(2)}
             onFinish={finish}
             saving={saving}
           />
@@ -134,6 +147,60 @@ function StepVehicle({ value, onChange, onNext }) {
       <Button className="mt-8 w-full" disabled={!value} onClick={onNext}>
         Continuar
       </Button>
+    </div>
+  )
+}
+
+function StepPlatforms({ value, onChange, onBack, onNext }) {
+  function toggle(id) {
+    onChange(value.includes(id) ? value.filter((p) => p !== id) : [...value, id])
+  }
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold text-ink-high">Em quais apps você trabalha?</h1>
+      <p className="mt-1.5 text-sm text-ink-mid">
+        Pode escolher mais de um. Isso ajuda a organizar suas receitas por plataforma.
+      </p>
+
+      <div className="mt-6 flex flex-col gap-3">
+        {PLATFORMS.map((p) => {
+          const selected = value.includes(p.id)
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => toggle(p.id)}
+              className={`flex items-center gap-3 rounded-2xl border p-3 transition-colors ${
+                selected
+                  ? 'border-brand-500 bg-brand-500/10'
+                  : 'border-base-border bg-base-surface2 hover:border-brand-500/40'
+              }`}
+            >
+              <PlatformIcon platform={p} />
+              <span className="flex-1 text-left text-sm font-medium text-ink-high">{p.label}</span>
+              <span
+                className={`flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
+                  selected
+                    ? 'border-brand-500 bg-brand-500 text-white'
+                    : 'border-base-border text-transparent'
+                }`}
+              >
+                ✓
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="mt-8 flex gap-3">
+        <Button variant="secondary" onClick={onBack} className="flex-1">
+          Voltar
+        </Button>
+        <Button disabled={value.length === 0} onClick={onNext} className="flex-1">
+          Continuar
+        </Button>
+      </div>
     </div>
   )
 }

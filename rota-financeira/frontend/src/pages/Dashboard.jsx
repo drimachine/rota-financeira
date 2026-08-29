@@ -7,19 +7,6 @@ import ProgressBar from '../components/ProgressBar'
 import { api } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 
-const fallback = {
-  net_profit: 2847.5,
-  revenue_total: 4210,
-  cost_total: 1362.5,
-  variation_pct: 18,
-  goal: { title: 'Trocar de moto', target_amount: 4000, current_amount: 2860, deadline: null },
-  recent: [
-    { id: 1, type: 'revenue', label: 'iFood', amount: 87.5, date: 'Hoje, 14:20' },
-    { id: 2, type: 'cost', label: 'Combustível', amount: 40, date: 'Hoje, 09:10' },
-    { id: 3, type: 'revenue', label: '99', amount: 63.2, date: 'Ontem, 19:45' },
-  ],
-}
-
 function currency(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
@@ -33,28 +20,48 @@ function motivationalMessage(pct) {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const [summary, setSummary] = useState(fallback)
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     let mounted = true
     api
       .getDashboardSummary()
       .then((data) => mounted && setSummary(data))
-      .catch(() => {
-        /* usa dados de exemplo enquanto o backend não está conectado */
-      })
+      .catch(() => mounted && setError(true))
       .finally(() => mounted && setLoading(false))
     return () => {
       mounted = false
     }
   }, [])
 
+  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'motorista'
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+      </div>
+    )
+  }
+
+  if (error || !summary) {
+    return (
+      <div>
+        <Header title={`Olá, ${firstName} 👋`} />
+        <Card className="flex flex-col items-center gap-3 py-10 text-center">
+          <span className="text-3xl">⚠️</span>
+          <p className="text-sm font-medium text-ink-high">Não foi possível carregar seu resumo</p>
+          <p className="text-sm text-ink-mid">Verifique sua conexão e tente novamente.</p>
+        </Card>
+      </div>
+    )
+  }
+
   const goalPct = summary.goal
     ? Math.min(100, Math.round((summary.goal.current_amount / summary.goal.target_amount) * 100))
     : 0
-
-  const firstName = user?.user_metadata?.name?.split(' ')[0] || 'motorista'
 
   return (
     <div>
@@ -136,27 +143,29 @@ export default function Dashboard() {
       {/* Atividade recente */}
       <div>
         <h2 className="mb-3 text-sm font-semibold text-ink-mid">Atividade recente</h2>
-        <div className="flex flex-col gap-2">
-          {summary.recent?.map((item) => (
-            <Card key={item.id} className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-sm font-medium text-ink-high">{item.label}</p>
-                <p className="text-xs text-ink-low">{item.date}</p>
-              </div>
-              <p
-                className={`font-display text-sm font-semibold tabular ${
-                  item.type === 'revenue' ? 'text-good' : 'text-bad'
-                }`}
-              >
-                {item.type === 'revenue' ? '+' : '-'}
-                {currency(item.amount)}
-              </p>
-            </Card>
-          ))}
-        </div>
+        {summary.recent?.length ? (
+          <div className="flex flex-col gap-2">
+            {summary.recent.map((item) => (
+              <Card key={item.id} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium text-ink-high">{item.label}</p>
+                  <p className="text-xs text-ink-low">{item.date}</p>
+                </div>
+                <p
+                  className={`font-display text-sm font-semibold tabular ${
+                    item.type === 'revenue' ? 'text-good' : 'text-bad'
+                  }`}
+                >
+                  {item.type === 'revenue' ? '+' : '-'}
+                  {currency(item.amount)}
+                </p>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="py-6 text-center text-sm text-ink-mid">Nenhuma atividade este mês ainda.</Card>
+        )}
       </div>
-
-      {loading && <p className="mt-4 text-center text-xs text-ink-low">Atualizando dados...</p>}
     </div>
   )
 }

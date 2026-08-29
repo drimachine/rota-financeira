@@ -5,12 +5,6 @@ import Card from '../components/Card'
 import Button from '../components/Button'
 import { api } from '../lib/api'
 
-const fallback = [
-  { id: 1, platform: 'iFood', amount: 87.5, date: '2026-08-28', notes: null },
-  { id: 2, platform: '99', amount: 63.2, date: '2026-08-27', notes: 'corrida longa' },
-  { id: 3, platform: 'Keeta', amount: 45.0, date: '2026-08-26', notes: null },
-]
-
 function currency(v) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
@@ -19,10 +13,16 @@ function formatDate(d) {
 }
 
 export default function Revenues() {
-  const [items, setItems] = useState(fallback)
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    api.listRevenues().then(setItems).catch(() => {})
+    api
+      .listRevenues()
+      .then(setItems)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   const total = items.reduce((sum, i) => sum + i.amount, 0)
@@ -39,7 +39,11 @@ export default function Revenues() {
         }
       />
 
-      {items.length === 0 ? (
+      {loading ? (
+        <LoadingState />
+      ) : error ? (
+        <ErrorState />
+      ) : items.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="flex flex-col gap-2">
@@ -68,6 +72,24 @@ function EmptyState() {
       <span className="text-3xl">🧾</span>
       <p className="text-sm font-medium text-ink-high">Nenhuma receita registrada ainda</p>
       <p className="text-sm text-ink-mid">Toque em "+ Nova" para registrar sua primeira corrida.</p>
+    </Card>
+  )
+}
+
+function LoadingState() {
+  return (
+    <div className="flex justify-center py-10">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+    </div>
+  )
+}
+
+function ErrorState() {
+  return (
+    <Card className="flex flex-col items-center gap-3 py-10 text-center">
+      <span className="text-3xl">⚠️</span>
+      <p className="text-sm font-medium text-ink-high">Não foi possível carregar suas receitas</p>
+      <p className="text-sm text-ink-mid">Verifique sua conexão e tente novamente.</p>
     </Card>
   )
 }

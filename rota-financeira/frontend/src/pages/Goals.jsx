@@ -6,16 +6,6 @@ import ProgressBar from '../components/ProgressBar'
 import Input, { Field, Select } from '../components/Input'
 import { api } from '../lib/api'
 
-const fallback = [
-  {
-    id: 1,
-    title: 'Trocar de moto',
-    target_amount: 4000,
-    current_amount: 2860,
-    deadline: '2026-12-01',
-  },
-]
-
 const goalOptions = [
   'Trocar de veículo',
   'Guardar reserva de emergência',
@@ -29,17 +19,25 @@ function currency(v) {
 }
 
 export default function Goals() {
-  const [goals, setGoals] = useState(fallback)
+  const [goals, setGoals] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ title: goalOptions[0], target_amount: '', deadline: '' })
   const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
 
   useEffect(() => {
-    api.listGoals().then(setGoals).catch(() => {})
+    api
+      .listGoals()
+      .then(setGoals)
+      .catch(() => setLoadError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
+    setFormError('')
     setSaving(true)
     try {
       const created = await api.createGoal({
@@ -50,18 +48,8 @@ export default function Goals() {
       setGoals((g) => [...g, created])
       setShowForm(false)
       setForm({ title: goalOptions[0], target_amount: '', deadline: '' })
-    } catch {
-      setGoals((g) => [
-        ...g,
-        {
-          id: Date.now(),
-          title: form.title,
-          target_amount: Number(form.target_amount),
-          current_amount: 0,
-          deadline: form.deadline || null,
-        },
-      ])
-      setShowForm(false)
+    } catch (err) {
+      setFormError(err.message || 'Não foi possível salvar a meta. Tente novamente.')
     } finally {
       setSaving(false)
     }
@@ -108,6 +96,8 @@ export default function Goals() {
                 onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
               />
             </Field>
+            {formError && <p className="text-sm text-bad">{formError}</p>}
+
             <Button type="submit" disabled={saving} className="w-full">
               {saving ? 'Salvando...' : 'Salvar meta'}
             </Button>
@@ -115,7 +105,17 @@ export default function Goals() {
         </Card>
       )}
 
-      {goals.length === 0 && !showForm ? (
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+        </div>
+      ) : loadError ? (
+        <Card className="flex flex-col items-center gap-3 py-10 text-center">
+          <span className="text-3xl">⚠️</span>
+          <p className="text-sm font-medium text-ink-high">Não foi possível carregar suas metas</p>
+          <p className="text-sm text-ink-mid">Verifique sua conexão e tente novamente.</p>
+        </Card>
+      ) : goals.length === 0 && !showForm ? (
         <Card className="flex flex-col items-center gap-3 py-10 text-center">
           <span className="text-3xl">🎯</span>
           <p className="text-sm font-medium text-ink-high">Nenhuma meta definida ainda</p>

@@ -5,12 +5,6 @@ import Card from '../components/Card'
 import Button from '../components/Button'
 import { api } from '../lib/api'
 
-const fallback = [
-  { id: 1, category: 'Combustível', amount: 40, date: '2026-08-28', notes: null },
-  { id: 2, category: 'Manutenção', amount: 65, date: '2026-08-25', notes: 'troca de óleo' },
-  { id: 3, category: 'Alimentação', amount: 22.5, date: '2026-08-24', notes: null },
-]
-
 const categoryIcon = {
   'Combustível': '⛽',
   'Manutenção': '🔧',
@@ -27,10 +21,16 @@ function formatDate(d) {
 }
 
 export default function Costs() {
-  const [items, setItems] = useState(fallback)
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    api.listCosts().then(setItems).catch(() => {})
+    api
+      .listCosts()
+      .then(setItems)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   const total = items.reduce((sum, i) => sum + i.amount, 0)
@@ -47,7 +47,11 @@ export default function Costs() {
         }
       />
 
-      {items.length === 0 ? (
+      {loading ? (
+        <LoadingState />
+      ) : error ? (
+        <ErrorState />
+      ) : items.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="flex flex-col gap-2">
@@ -79,6 +83,24 @@ function EmptyState() {
       <span className="text-3xl">🧾</span>
       <p className="text-sm font-medium text-ink-high">Nenhum custo registrado ainda</p>
       <p className="text-sm text-ink-mid">Toque em "+ Novo" para registrar seu primeiro gasto.</p>
+    </Card>
+  )
+}
+
+function LoadingState() {
+  return (
+    <div className="flex justify-center py-10">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+    </div>
+  )
+}
+
+function ErrorState() {
+  return (
+    <Card className="flex flex-col items-center gap-3 py-10 text-center">
+      <span className="text-3xl">⚠️</span>
+      <p className="text-sm font-medium text-ink-high">Não foi possível carregar seus custos</p>
+      <p className="text-sm text-ink-mid">Verifique sua conexão e tente novamente.</p>
     </Card>
   )
 }

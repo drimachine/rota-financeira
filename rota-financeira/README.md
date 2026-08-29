@@ -94,8 +94,8 @@ O app sobe em `http://localhost:5173`.
 - Relatórios (evolução mensal com gráfico)
 - Perfil (dados da conta, logout)
 
-Navegação inferior fixa no mobile (Painel · Receitas · Custos · Metas · Perfil),
-que vira uma barra lateral em telas maiores (responsivo).
+Navegação inferior fixa (Painel · Receitas · Custos · Metas · Perfil), estilo
+apps de banco, em todas as telas — sem sidebar.
 
 ## Identidade visual
 

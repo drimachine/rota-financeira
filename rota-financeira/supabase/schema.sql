@@ -15,9 +15,13 @@ create table if not exists public.profiles (
   name text,
   email text,
   vehicle_type text check (vehicle_type in ('moto', 'bike', 'carro')),
+  platforms text[] not null default '{}',
   city text,
   created_at timestamptz not null default now()
 );
+
+-- Se a tabela já existia antes desta coluna ser adicionada, rode:
+-- alter table public.profiles add column if not exists platforms text[] not null default '{}';
 
 alter table public.profiles enable row level security;
 

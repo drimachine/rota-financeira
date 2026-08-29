@@ -10,64 +10,30 @@ const items = [
 
 export default function BottomNav() {
   return (
-    <>
-      {/* Mobile: barra inferior fixa */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-base-border bg-base-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden">
-        <ul className="mx-auto flex max-w-md items-stretch justify-between px-2">
-          {items.map(({ to, label, end, icon: Icon }) => (
-            <li key={to} className="flex-1">
-              <NavLink
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  `flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
-                    isActive ? 'text-brand-300' : 'text-ink-low hover:text-ink-mid'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon active={isActive} />
-                    <span>{label}</span>
-                  </>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Desktop: barra lateral fixa */}
-      <nav className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-base-border bg-base-surface/95 p-5 md:flex">
-        <div className="mb-8 px-1 text-lg font-display font-semibold text-ink-high">
-          Rota <span className="text-brand-300">Financeira</span>
-        </div>
-        <ul className="flex flex-col gap-1">
-          {items.map(({ to, label, end, icon: Icon }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-brand-500/15 text-brand-200'
-                      : 'text-ink-mid hover:bg-base-surface2 hover:text-ink-high'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon active={isActive} />
-                    <span>{label}</span>
-                  </>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </>
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-base-border bg-base-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+      <ul className="mx-auto flex max-w-md items-stretch justify-between px-2">
+        {items.map(({ to, label, end, icon: Icon }) => (
+          <li key={to} className="flex-1">
+            <NavLink
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
+                  isActive ? 'text-brand-300' : 'text-ink-low hover:text-ink-mid'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon active={isActive} />
+                  <span>{label}</span>
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
