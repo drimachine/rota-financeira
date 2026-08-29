@@ -8,7 +8,9 @@ Responde a uma pergunta simples: **"Quanto eu realmente ganhei?"**
 ## Stack
 
 - **Frontend:** React 18 + Vite + React Router + Tailwind CSS (mobile-first, responsivo)
-- **Backend:** Python + FastAPI
+- **Backend:** Python + FastAPI — inclusive a autenticação: o frontend fala só com a
+  API FastAPI (`/auth/signup`, `/auth/login`, `/auth/logout`), que por sua vez chama o
+  Supabase Auth. Nenhuma chamada ao Supabase é feita diretamente do navegador.
 - **Banco de dados / Auth:** Supabase (PostgreSQL + Auth + Row Level Security)
 
 ## Estrutura do projeto
@@ -29,9 +31,11 @@ rota-financeira/
 2. No **SQL Editor**, execute o conteúdo de `supabase/schema.sql`.
 3. Em **Project Settings > API**, copie:
    - `Project URL`
-   - `anon public key` (para o frontend)
-   - `service_role key` (para o backend — **nunca exponha no frontend**)
+   - `anon public key` (o backend usa para as chamadas de signup/login/logout)
+   - `service_role key` (para o backend acessar os dados — **nunca exponha no frontend**)
    - `JWT Secret` (em **JWT Settings**, para o backend validar os tokens)
+4. Em **Authentication > Sign In / Providers > Email**, confirme que o provedor de
+   e-mail está **habilitado** (senão signup/login retornam 400 `email_provider_disabled`).
 
 ### 2. Backend (FastAPI)
 
@@ -46,6 +50,7 @@ Crie um arquivo `.env` em `backend/` com:
 
 ```
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_ANON_KEY=sua-anon-key
 SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
 SUPABASE_JWT_SECRET=seu-jwt-secret
 FRONTEND_ORIGINS=http://localhost:5173
@@ -68,8 +73,6 @@ npm install
 Crie um arquivo `.env` em `frontend/` com:
 
 ```
-VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
-VITE_SUPABASE_ANON_KEY=sua-anon-key
 VITE_API_URL=http://localhost:8000
 ```
 
@@ -82,7 +85,7 @@ O app sobe em `http://localhost:5173`.
 ## Telas incluídas
 
 - Landing page (apresentação do produto, como funciona, FAQ)
-- Login / Cadastro (Supabase Auth)
+- Login / Cadastro (via API FastAPI, que usa o Supabase Auth por trás)
 - Onboarding (veículo, cidade, meta financeira)
 - Dashboard (lucro líquido, receitas, custos, progresso da meta, mensagem motivacional)
 - Nova receita / Novo custo

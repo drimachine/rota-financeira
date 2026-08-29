@@ -26,15 +26,13 @@ export default function Signup() {
     setLoading(true)
     try {
       const data = await signUp(form)
-      if (!data.session) {
-        setError('Conta criada! Verifique seu e-mail para confirmar o cadastro antes de entrar.')
+      if (data.pending_confirmation) {
+        setError(data.message)
         return
       }
       navigate('/onboarding')
     } catch (err) {
-      setError(err.message === 'User already registered'
-        ? 'Este e-mail já está cadastrado.'
-        : 'Não foi possível criar sua conta. Tente novamente.')
+      setError(err.message || 'Não foi possível criar sua conta. Tente novamente.')
     } finally {
       setLoading(false)
     }

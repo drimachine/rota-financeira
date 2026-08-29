@@ -1,17 +1,25 @@
-import { supabase } from './supabaseClient'
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const SESSION_KEY = 'rota-financeira-session'
 
-async function authHeader() {
-  const { data } = await supabase.auth.getSession()
-  const token = data?.session?.access_token
-  return token ? { Authorization: `Bearer ${token}` } : {}
+export function getStoredSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
 }
 
-async function request(path, { method = 'GET', body } = {}) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(await authHeader()),
+export function storeSession(session) {
+  if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+  else localStorage.removeItem(SESSION_KEY)
+}
+
+async function request(path, { method = 'GET', body, auth = true } = {}) {
+  const headers = { 'Content-Type': 'application/json' }
+  if (auth) {
+    const session = getStoredSession()
+    if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
   }
   const res = await fetch(`${API_URL}${path}`, {
     method,
@@ -27,6 +35,11 @@ async function request(path, { method = 'GET', body } = {}) {
 }
 
 export const api = {
+  // Autenticação
+  signup: (payload) => request('/auth/signup', { method: 'POST', body: payload, auth: false }),
+  login: (payload) => request('/auth/login', { method: 'POST', body: payload, auth: false }),
+  logout: (payload) => request('/auth/logout', { method: 'POST', body: payload, auth: false }),
+
   // Perfil / onboarding
   getProfile: () => request('/users/me'),
   updateProfile: (payload) => request('/users/me', { method: 'PATCH', body: payload }),

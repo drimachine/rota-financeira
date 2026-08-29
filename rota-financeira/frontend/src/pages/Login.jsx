@@ -24,9 +24,7 @@ export default function Login() {
       await signIn(form)
       navigate('/app')
     } catch (err) {
-      setError(err.message === 'Email not confirmed'
-        ? 'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.'
-        : 'E-mail ou senha incorretos. Tente novamente.')
+      setError(err.message || 'E-mail ou senha incorretos. Tente novamente.')
     } finally {
       setLoading(false)
     }

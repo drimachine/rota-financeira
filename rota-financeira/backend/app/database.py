@@ -14,3 +14,14 @@ def get_supabase() -> Client:
     """
     settings = get_settings()
     return create_client(settings.supabase_url, settings.supabase_service_role_key)
+
+
+@lru_cache
+def get_supabase_auth() -> Client:
+    """Cliente Supabase autenticado com a anon key, usado só para signup/login/logout.
+
+    Mantém o mesmo nível de privilégio que o frontend teria, em vez de usar a
+    service role key (reservada às operações de dados em get_supabase()).
+    """
+    settings = get_settings()
+    return create_client(settings.supabase_url, settings.supabase_anon_key)
